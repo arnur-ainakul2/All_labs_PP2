@@ -1,6 +1,6 @@
 import os
 path=input("Input specified path:")
-print("Files in specified folder are :",os.listdir(f"{path}"))
+print("Files in specified folder are :",os.listdir(path))
 #1)
 files = []
 for f in os.listdir(path):
