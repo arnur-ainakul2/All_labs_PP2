@@ -74,13 +74,13 @@ class Coin(pygame.sprite.Sprite):
         original_image = pygame.image.load("Coin.png")  # Load the original coin image
         self.image = pygame.transform.scale(original_image, (40, 40))  # Resize to 40x40 pixels
         self.rect = self.image.get_rect()
-        self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), random.randint(0, SCREEN_HEIGHT - 200))
+        self.rect.center = (300, 500)
     
     def move(self):
         self.rect.move_ip(0, SPEED)
         if self.rect.top > SCREEN_HEIGHT:
             self.rect.top = 0
-            self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
+            self.rect.center = (random.randint(200, SCREEN_WIDTH - 40), random.randint(0,300))
 
 # Setting up Sprites
 P1 = Player()

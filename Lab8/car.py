@@ -132,7 +132,7 @@ while True:
     
     # Checking for collision with coin
     if pygame.sprite.spritecollideany(P1, coins):
-        COINS += 1
+        COINS += random.randint(1,10)
         C1.rect.top = 0  # Reset coin position after collection
         C1.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
     

@@ -49,6 +49,8 @@ key_actions = {
     pygame.K_RIGHT: next_track,
     pygame.K_LEFT: prev_track
 }
+background=pygame.image.load("back.png")
+back=pygame.transform.scale(background,(600,500))
 
 # Основной цикл
 running = True
@@ -61,15 +63,9 @@ while running:
         elif event.type == pygame.KEYDOWN and event.key in key_actions:
             key_actions[event.key]()  # Вызываем соответствующую функцию
 
-    # Визуализация
-    bars = np.random.randint(10, 100, num_bars)
-    for i, h in enumerate(bars):
-        pygame.draw.rect(screen, (0, 255, 0), (i * (W // num_bars), H // 2 - h // 2, W // num_bars - 2, h))
-
-    # Отображение текста
+    screen.blit(back,(0,0))
     screen.blit(font.render(f"Now Playing: {music_files[track]}", True, (255, 255, 255)), (20, 20))
     screen.blit(font.render("Space: Play/Pause | ← Prev | → Next", True, (200, 200, 200)), (20, 450))
-
     pygame.display.flip()
     pygame.time.delay(100)
 

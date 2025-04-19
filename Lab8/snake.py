@@ -10,6 +10,7 @@ black = (0, 0, 0)
 red = (213, 50, 80)
 green = (0, 255, 0)
 blue = (50, 153, 213)
+FOOD_TIME_LIMIT = 5000  # Время жизни еды в миллисекундах (5000мс = 5 секунд)
 
 # Screen dimensions
 dis_width = 800
@@ -18,10 +19,10 @@ dis = pygame.display.set_mode((dis_width, dis_height))
 pygame.display.set_caption('Snake Game')
 
 # Game settings
-snake_block = 10
-initial_speed = 15  # Base speed
-speed_increase = 2  # Speed increase per level
-level_up_score = 3  # Score needed to level up
+snake_block = 10  # размер каждого блока змеи
+initial_speed = 15  # начальная скорость
+speed_increase = 2  # увеличение скорости за уровень
+level_up_score = 3  # Количество очков для повышения уровня
 
 # Fonts
 font_style = pygame.font.SysFont("bahnschrift", 25)
@@ -39,18 +40,32 @@ def message(msg, color):
     mesg = font_style.render(msg, True, color)
     dis.blit(mesg, [dis_width / 6, dis_height / 3])
 
+class Food:
+    def __init__(self):
+        self.x = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
+        self.y = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+        self.time_created = pygame.time.get_ticks()  # Время создания еды
+
+    def draw(self):
+        pygame.draw.rect(dis, green, [self.x, self.y, snake_block, snake_block])
+
+    def is_expired(self):
+        # Проверка, прошло ли 5 секунд с момента создания еды
+        if pygame.time.get_ticks() - self.time_created > FOOD_TIME_LIMIT:
+            return True
+        return False
+
 def gameLoop():
     game_over = False
     game_close = False
     
-    x1, y1 = dis_width / 2, dis_height / 2  # Snake start position
+    x1, y1 = dis_width / 2, dis_height / 2  # Начальная позиция змеи
     x1_change, y1_change = 0, 0
     
     snake_list = []
     snake_length = 1
     
-    foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-    foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+    food = Food()  # Создаем объект еды
     
     score = 0
     level = 1
@@ -88,7 +103,7 @@ def gameLoop():
                     y1_change = snake_block
                     x1_change = 0
         
-        # Border collision check
+        # Проверка на столкновение с границами
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             game_close = True
         
@@ -96,30 +111,33 @@ def gameLoop():
         y1 += y1_change
         dis.fill(blue)
         
-        # Draw food
-        pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
+        # Рисуем еду
+        food.draw()
+
+        # Проверяем, не истекло ли время жизни еды
+        if food.is_expired():
+            food = Food()  # Создаем новую еду, если старая исчезла
         
-        # Update snake body
+        # Обновляем тело змеи
         snake_head = [x1, y1]
         snake_list.append(snake_head)
         if len(snake_list) > snake_length:
             del snake_list[0]
         
-        # Collision with itself
+        # Проверка на столкновение с собой
         if snake_head in snake_list[:-1]:  # Проверяем, есть ли голова в теле змеи
              game_close = True
         draw_snake(snake_block, snake_list)
         show_score(score, level)
         pygame.display.update()
         
-        # Food collision
-        if x1 == foodx and y1 == foody:
-            foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-            foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+        # Столкновение с едой
+        if x1 == food.x and y1 == food.y:
+            food = Food()  # Создаем новую еду
             snake_length += 1
-            score += 1
+            score += random.randint(0, 10)
             
-            # Level up
+            # Повышение уровня
             if score % level_up_score == 0:
                 level += 1
                 snake_speed += speed_increase
